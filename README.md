@@ -2,6 +2,11 @@
 
 一个可复用的 Web 实时耳返 TypeScript 库，基于 Web Audio API 实现，支持音量调节、降噪和延迟优化。
 
+[![GitHub](https://img.shields.io/badge/GitHub-first--dong%2FEarReflectJS--IEMs-blue)](https://github.com/first-dong/EarReflectJS-IEMs)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
+**项目地址：** [https://github.com/first-dong/EarReflectJS-IEMs](https://github.com/first-dong/EarReflectJS-IEMs)
+
 ## ✨ 特性
 
 - 🎤 **实时耳返**：麦克风输入即时播放，低延迟
@@ -15,20 +20,26 @@
 
 ## 📦 安装
 
+
+
+### 方式一：克隆仓库后本地安装
+
 ```bash
-pnpm add ear-reflect-js
+# 克隆仓库
+git clone https://github.com/first-dong/EarReflectJS-IEMs.git
+cd EarReflectJS-IEMs
+
+# 安装依赖
+pnpm install
+
+# 构建项目
+pnpm build
 ```
 
-或使用 npm：
+然后在你的项目中引用构建后的文件：
 
-```bash
-npm install ear-reflect-js
-```
-
-或使用 yarn：
-
-```bash
-yarn add ear-reflect-js
+```typescript
+import { EarReflect } from './path/to/EarReflectJS-IEMs/dist/ear-reflect-js.js';
 ```
 
 ## 🚀 快速开始
@@ -104,7 +115,10 @@ try {
   <input type="range" id="volume" min="0" max="1" step="0.01" value="0.7">
   
   <script type="module">
+    // 从 GitHub 安装后使用
     import { EarReflect } from './node_modules/ear-reflect-js/dist/ear-reflect-js.js';
+    // 或直接使用构建后的文件
+    // import { EarReflect } from './path/to/EarReflectJS-IEMs/dist/ear-reflect-js.js';
     
     const earReflect = new EarReflect();
     
@@ -207,8 +221,8 @@ if (compatibility.supported) {
 ### 克隆项目
 
 ```bash
-git clone <repository-url>
-cd EarReflectJS_IEMs
+git clone https://github.com/first-dong/EarReflectJS-IEMs.git
+cd EarReflectJS-IEMs
 ```
 
 ### 安装依赖
