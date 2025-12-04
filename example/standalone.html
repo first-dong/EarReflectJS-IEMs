@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>实时耳返示例 - 独立版本</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 100%;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .note {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #856404;
+    }
+
+    .control-group {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      color: #333;
+      margin-bottom: 8px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: #e0e0e0;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #667eea;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #667eea;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .value-display {
+      min-width: 50px;
+      text-align: right;
+      color: #667eea;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    button {
+      flex: 1;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-start:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-start:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-stop {
+      background: #f44336;
+      color: white;
+    }
+
+    .btn-stop:hover {
+      background: #d32f2f;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+    }
+
+    .btn-stop:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: #f5f5f5;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .status.running {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .status.error {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .compatibility-check {
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .compatibility-check.supported {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .compatibility-check.unsupported {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎧 实时耳返演示</h1>
+    <p class="subtitle">EarReflectJS - 基于 Web Audio API 的实时耳返库</p>
+
+    <div class="note">
+      <strong>注意：</strong>此页面需要先构建项目（运行 <code>pnpm build</code>），然后通过 HTTP 服务器访问。
+      或者使用开发模式：<code>pnpm dev</code> 然后访问 <code>http://localhost:3000/example/index.html</code>
+    </div>
+
+    <div id="compatibility-check" class="compatibility-check"></div>
+
+    <div class="control-group">
+      <label for="volume-slider">音量调节</label>
+      <div class="slider-container">
+        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.7">
+        <span class="value-display" id="volume-value">70%</span>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label for="noise-reduction-slider">降噪强度</label>
+      <div class="slider-container">
+        <input type="range" id="noise-reduction-slider" min="0" max="1" step="0.01" value="0.5">
+        <span class="value-display" id="noise-reduction-value">50%</span>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="checkbox-group">
+        <input type="checkbox" id="noise-reduction-toggle" checked>
+        <label for="noise-reduction-toggle">启用降噪</label>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button id="start-btn" class="btn-start">开始耳返</button>
+      <button id="stop-btn" class="btn-stop" disabled>停止耳返</button>
+    </div>
+
+    <div id="status" class="status">等待启动...</div>
+  </div>
+
+  <!-- 使用构建后的库文件 -->
+  <script type="module">
+    // 注意：需要先运行 pnpm build，然后通过 HTTP 服务器访问此文件
+    // 或者使用开发模式：pnpm dev
+    import { EarReflect } from '../dist/ear-reflect-js.js';
+
+    let earReflect = null;
+
+    // 检查浏览器兼容性
+    const compatibility = EarReflect.checkCompatibility();
+    const compatibilityEl = document.getElementById('compatibility-check');
+    
+    if (compatibility.supported) {
+      compatibilityEl.className = 'compatibility-check supported';
+      compatibilityEl.textContent = '✅ 浏览器兼容性检查通过';
+    } else {
+      compatibilityEl.className = 'compatibility-check unsupported';
+      compatibilityEl.textContent = `❌ 浏览器不支持: ${compatibility.issues.join(', ')}`;
+    }
+
+    // 获取 DOM 元素
+    const startBtn = document.getElementById('start-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const volumeSlider = document.getElementById('volume-slider');
+    const volumeValue = document.getElementById('volume-value');
+    const noiseReductionSlider = document.getElementById('noise-reduction-slider');
+    const noiseReductionValue = document.getElementById('noise-reduction-value');
+    const noiseReductionToggle = document.getElementById('noise-reduction-toggle');
+    const statusEl = document.getElementById('status');
+
+    // 更新状态显示
+    function updateStatus(message, type = '') {
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+    }
+
+    // 开始耳返
+    startBtn.addEventListener('click', async () => {
+      try {
+        updateStatus('正在启动耳返...', '');
+        startBtn.disabled = true;
+
+        earReflect = new EarReflect({
+          volume: parseFloat(volumeSlider.value),
+          enableNoiseReduction: noiseReductionToggle.checked,
+          noiseReductionLevel: parseFloat(noiseReductionSlider.value),
+          latency: 0 // 最小延迟
+        });
+
+        await earReflect.start();
+        
+        updateStatus('✅ 耳返已启动，请对着麦克风说话', 'running');
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+      } catch (error) {
+        updateStatus(`❌ 启动失败: ${error.message}`, 'error');
+        startBtn.disabled = false;
+        console.error('启动耳返失败:', error);
+      }
+    });
+
+    // 停止耳返
+    stopBtn.addEventListener('click', () => {
+      if (earReflect) {
+        earReflect.stop();
+        earReflect = null;
+        updateStatus('⏹️ 耳返已停止', '');
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      }
+    });
+
+    // 音量调节
+    volumeSlider.addEventListener('input', (e) => {
+      const value = parseFloat(e.target.value);
+      volumeValue.textContent = Math.round(value * 100) + '%';
+      
+      if (earReflect) {
+        earReflect.setVolume(value);
+      }
+    });
+
+    // 降噪强度调节
+    noiseReductionSlider.addEventListener('input', (e) => {
+      const value = parseFloat(e.target.value);
+      noiseReductionValue.textContent = Math.round(value * 100) + '%';
+      
+      if (earReflect) {
+        earReflect.setNoiseReductionLevel(value);
+      }
+    });
+
+    // 降噪开关
+    noiseReductionToggle.addEventListener('change', (e) => {
+      if (earReflect) {
+        earReflect.setNoiseReduction(e.target.checked);
+      }
+    });
+
+    // 页面卸载时清理资源
+    window.addEventListener('beforeunload', () => {
+      if (earReflect) {
+        earReflect.destroy();
+      }
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,42 @@
+{
+  "name": "ear-reflect-js",
+  "version": "1.0.0",
+  "description": "一个可复用的 Web 实时耳返 TypeScript 库，支持音量调节、降噪和延迟优化",
+  "type": "module",
+  "main": "./dist/ear-reflect-js.umd.cjs",
+  "module": "./dist/ear-reflect-js.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/ear-reflect-js.js",
+      "require": "./dist/ear-reflect-js.umd.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "ear-reflect",
+    "monitoring",
+    "audio",
+    "webaudio",
+    "typescript",
+    "real-time"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8",
+    "vite-plugin-dts": "^3.7.0"
+  }
+}
+
